@@ -31,7 +31,7 @@ jobs:
             - name: check jadx
               run: ls ${{ runner.temp }}/jadx
             - name: decompile apk
-              run: /opt/jadx/bin/jadx -d jadx.out -e -m simple --deobf --use-dx $apk-name
+              run: ${{ runner.temp }}/jadx/bin/jadx -d jadx.out -e -m simple --deobf --use-dx $apk-name
             - name: list out files
               run: ls -la jadx.out
             - name: zip out files
