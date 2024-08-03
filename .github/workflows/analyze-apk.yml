@@ -6,7 +6,7 @@ jobs:
         runs-on: ubuntu-22.04
         steps:
             - name: install jq and java-21-jdk
-              run: sudo apt install jq openjdk-21-jdk
+              run: sudo apt update && sudo apt install jq openjdk-21-jdk
             - name: download jadx
               run: |
                     wget $(curl -s https://api.github.com/repos/skylot/jadx/releases/latest |jq '.assets[0].browser_download_url' -r) -O ${{ runner.temp }}/jadx.zip
