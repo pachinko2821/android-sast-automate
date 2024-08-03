@@ -1,0 +1,43 @@
+name: APK Analysis
+run-name: Analysing APK Files
+on: [push]
+jobs:
+    clone-repo:
+        runs-on: ubuntu-22.04
+        outputs:
+            apk-name: ${{ steps.apk-name.outputs.name }}
+        steps:
+            - run: echo "Running on ${{ runner.os }} server"
+            - name: checkout repo
+              uses: actions/checkout@v4
+            - run: echo "cloned ${{ github.repository }} to the runner"
+            - id: apk-name
+              name: List files in repo
+              run: |
+               ls ${{ github.workspace }}/*.apk
+               echo "name=$(ls ${{ github.workspace }}/*.apk)" >> "$GITHUB_OUTPUT"
+    decompile-apk:
+        needs: [clone-repo]
+        runs-on: ubuntu-22.04
+        env:
+            apk-name: ${{ needs.clone-repo.outputs.apk-name }}
+        steps:
+            - name: install jq
+              run: apt install jq
+            - name: download jadx
+              run: |
+                    wget $(curl -s https://api.github.com/repos/skylot/jadx/releases/latest |jq '.assets[0].browser_download_url' -r) -O ${{ runner.temp }}/jadx.zip
+                    unzip ${{ runner.temp }}/jadx.zip -d ${{ runner.temp }}/jadx
+            - name: check jadx
+              run: ls ${{ runner.temp }}/jadx
+            - name: decompile apk
+              run: /opt/jadx/bin/jadx -d jadx.out -e -m simple --deobf --use-dx $apk-name
+            - name: list out files
+              run: ls -la jadx.out
+            - name: zip out files
+              run: zip -r apk-decompile.zip jadx.out
+            - name: 'Upload Artifact'
+              uses: actions/upload-artifact@v4
+              with:
+               name: apk-decompile.zip
+               path: apk-decompile.zip
