@@ -22,7 +22,7 @@ jobs:
         env:
             apk-name: ${{ needs.clone-repo.outputs.apk-name }}
         steps:
-            - name: install jq
+            - name: sudo install jq
               run: apt install jq
             - name: download jadx
               run: |
