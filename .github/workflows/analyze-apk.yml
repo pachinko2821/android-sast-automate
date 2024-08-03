@@ -5,13 +5,13 @@ jobs:
     clone-repo:
         runs-on: ubuntu-22.04
         outputs:
-            apk-name: ${{ steps.apk-name.outputs.name }}
+            apk_name: ${{ steps.apk_name.outputs.name }}
         steps:
             - run: echo "Running on ${{ runner.os }} server"
             - name: checkout repo
               uses: actions/checkout@v4
             - run: echo "cloned ${{ github.repository }} to the runner"
-            - id: apk-name
+            - id: apk_name
               name: List files in repo
               run: |
                ls ${{ github.workspace }}/*.apk
@@ -20,7 +20,7 @@ jobs:
         needs: [clone-repo]
         runs-on: ubuntu-22.04
         env:
-            apk-name: ${{ needs.clone-repo.outputs.apk-name }}
+            apk_name: ${{ needs.clone-repo.outputs.apk_name }}
         steps:
             - name: install jq
               run: sudo apt install jq
@@ -31,7 +31,7 @@ jobs:
             - name: check jadx
               run: ls ${{ runner.temp }}/jadx
             - name: decompile apk
-              run: ${{ runner.temp }}/jadx/bin/jadx -d jadx.out -e -m simple --deobf --use-dx $apk-name
+              run: ${{ runner.temp }}/jadx/bin/jadx -d jadx.out -e -m simple --deobf --use-dx $apk_name
             - name: list out files
               run: ls -la jadx.out
             - name: zip out files
